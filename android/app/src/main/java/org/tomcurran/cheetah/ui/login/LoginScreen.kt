@@ -15,11 +15,15 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import org.tomcurran.cheetah.ui.MainActivity
 import org.tomcurran.cheetah.ui.theme.CheetahTheme
 
 @Composable
 fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
     val name: String by loginViewModel.name.observeAsState("")
+    if (name.isNotEmpty()) {
+        MainActivity.keepSplashScreenVisible = false
+    }
     val loggingIn: Boolean by loginViewModel.loggingIn.observeAsState(false)
     LoginContent(
         name = name,
