@@ -2,10 +2,7 @@ package org.tomcurran.cheetah.ui.login
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -40,13 +37,16 @@ fun LoginContent(name: String, loggingIn: Boolean, onLoginClick: () -> Unit) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(text = "Hello $name!")
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                enabled = !loggingIn,
-                onClick = onLoginClick,
-            ) {
-                Text(text = "Login!")
+            if (loggingIn) {
+                CircularProgressIndicator()
+            } else {
+                Text(text = "Hello $name!")
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = onLoginClick,
+                ) {
+                    Text(text = "Login!")
+                }
             }
         }
     }

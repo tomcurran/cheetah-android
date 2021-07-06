@@ -22,7 +22,6 @@ class LoginViewModel : ViewModel() {
 
     fun login() {
         viewModelScope.launch {
-            _name.value = "Android"
             _loggingIn.value = true
             kotlinx.coroutines.delay(2000)
             _name.value = "Android (updated)"
