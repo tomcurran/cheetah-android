@@ -4,7 +4,7 @@ plugins {
 }
 
 def props = new Properties()
-props.load(new FileInputStream(file("release.properties")))
+props.load(new FileInputStream(file("secret.properties")))
 
 android {
     compileSdkVersion "android-S"
@@ -16,6 +16,9 @@ android {
         targetSdk 30
         versionCode 1
         versionName "0.1.0"
+
+        buildConfigField "String", "STRAVA_OAUTH_CLIENT_ID", "\"${props.stravaOAuthClientId}\""
+        buildConfigField "String", "STRAVA_OAUTH_CLIENT_SECRET", "\"${props.stravaOAuthClientSecret}\""
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -38,12 +41,9 @@ android {
         }
     }
 
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
-        }
+    productFlavors.all {
+        ext.stravaOAuthRedirectScheme = null
+        ext.stravaOAuthRedirectDomain = "auth"
     }
 
     flavorDimensions "version"
@@ -52,9 +52,29 @@ android {
             dimension "version"
             applicationIdSuffix ".dev"
             versionNameSuffix "-dev"
+            stravaOAuthRedirectScheme = "cheetah-dev.tomcurran.org"
         }
         appstore {
             dimension "version"
+            stravaOAuthRedirectScheme = "cheetah.tomcurran.org"
+        }
+    }
+
+    buildTypes {
+        all {
+            productFlavors {
+                all {
+                    manifestPlaceholders = [
+                            'appAuthRedirectScheme': stravaOAuthRedirectScheme,
+                    ]
+                    buildConfigField "String", "STRAVA_OAUTH_REDIRECT_URI", "\"$stravaOAuthRedirectScheme://$stravaOAuthRedirectDomain\""
+                }
+            }
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 
@@ -85,6 +105,7 @@ dependencies {
     implementation 'androidx.activity:activity-compose:1.3.0-rc01'
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07"
     implementation 'androidx.core:core-splashscreen:1.0.0-alpha01'
+    implementation 'net.openid:appauth:0.9.1'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
