@@ -53,10 +53,12 @@ android {
             applicationIdSuffix ".dev"
             versionNameSuffix "-dev"
             stravaOAuthRedirectScheme = "cheetah-dev.tomcurran.org"
+            buildConfigField "String", "FIREBASE_CUSTOM_TOKEN_HOST", "\"https://cheetah-dev.tomcurran.org\""
         }
         appstore {
             dimension "version"
             stravaOAuthRedirectScheme = "cheetah.tomcurran.org"
+            buildConfigField "String", "FIREBASE_CUSTOM_TOKEN_HOST", "\"https://cheetah.tomcurran.org\""
         }
     }
 
@@ -106,6 +108,8 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07"
     implementation 'androidx.core:core-splashscreen:1.0.0-alpha01'
     implementation 'net.openid:appauth:0.9.1'
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'

@@ -12,11 +12,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.openid.appauth.*
+import okhttp3.OkHttpClient
 import org.tomcurran.cheetah.BuildConfig
 import org.tomcurran.cheetah.R
 import org.tomcurran.cheetah.util.Event
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -25,6 +29,12 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         private const val STRAVA_OAUTH_AUTH_ENDPOINT = "https://www.strava.com/oauth/mobile/authorize"
         private const val STRAVA_OAUTH_TOKEN_ENDPOINT = "https://www.strava.com/api/v3/oauth/token"
     }
+
+    private val _firebaseCustomTokenService = Retrofit.Builder()
+        .baseUrl(BuildConfig.FIREBASE_CUSTOM_TOKEN_HOST)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+        .create(FirebaseCustomTokenService::class.java)
 
     private val _authService = AuthorizationService(getApplication())
 
@@ -77,6 +87,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     fun onActivityResult(activityResult: ActivityResult) {
         viewModelScope.launch(Dispatchers.IO) {
+            var debugInfo = ""
             val data = activityResult.data
             if (activityResult.resultCode == Activity.RESULT_OK && data != null) {
                 val authResponse = AuthorizationResponse.fromIntent(data)
@@ -93,25 +104,26 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                             }
                         }
                         authState.update(tokenResponse, tokenEx);
-                        withContext(Dispatchers.Main) {
-                            if (authState.isAuthorized) {
-                                _debugInfo.value = "Access token: ${authState.accessToken?.subSequence(0, 8)}..."
-                            } else {
-                                _debugInfo.value = "Not authorised"
+                        val refreshToken = authState.refreshToken
+                        if (authState.isAuthorized && refreshToken != null) {
+                            try {
+                                val firebaseTokenResponse = _firebaseCustomTokenService.firebaseToken(refreshToken)
+                                debugInfo = "Firebase token: ${firebaseTokenResponse.firebaseCustomToken?.subSequence(0, 8)}..."
+                            } catch (_: Exception) {
+                                debugInfo = "Error getting firebase token"
                             }
+                        } else {
+                            debugInfo = "Not authorised"
                         }
                     } else {
-                        withContext(Dispatchers.Main) {
-                            _debugInfo.value = "Error / Cancelled"
-                        }
+                        debugInfo = "Error / Cancelled"
                     }
                 }
             } else {
-                withContext(Dispatchers.Main) {
-                    _debugInfo.value = "Error / Cancelled"
-                }
+                debugInfo = "Error / Cancelled"
             }
             withContext(Dispatchers.Main) {
+                _debugInfo.value = debugInfo
                 _loggingIn.value = false
             }
         }
