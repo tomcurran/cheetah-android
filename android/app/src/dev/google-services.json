@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "273837129848",
+    "project_id": "cheetah-dev1",
+    "storage_bucket": "cheetah-dev1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:273837129848:android:be41cf96f33975d79ead8d",
+        "android_client_info": {
+          "package_name": "org.tomcurran.cheetah.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "273837129848-enrcdmq1f0e6j8amth0u5ov9v9796js2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.tomcurran.cheetah.dev",
+            "certificate_hash": "ff1c4c7ce509b9f985e2731508f6627f0fd6311c"
+          }
+        },
+        {
+          "client_id": "273837129848-p9j3cp09av6gr7q6h2m2lb4c2podoooe.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.tomcurran.cheetah.dev",
+            "certificate_hash": "6cd450d32643cc0b09bd141059b184dbd51aa3b8"
+          }
+        },
+        {
+          "client_id": "273837129848-79s6s83dlqe06231hqpcn1m1btmoinek.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7-akV_xrxv9o205Dx-EmE9Zm9Fjfxtz4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "273837129848-79s6s83dlqe06231hqpcn1m1btmoinek.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

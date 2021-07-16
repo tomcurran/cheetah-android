@@ -8,11 +8,14 @@ import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import net.openid.appauth.*
-import okhttp3.OkHttpClient
 import org.tomcurran.cheetah.BuildConfig
 import org.tomcurran.cheetah.R
 import org.tomcurran.cheetah.util.Event
@@ -21,7 +24,6 @@ import kotlin.coroutines.suspendCoroutine
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     companion object {
@@ -29,6 +31,8 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         private const val STRAVA_OAUTH_AUTH_ENDPOINT = "https://www.strava.com/oauth/mobile/authorize"
         private const val STRAVA_OAUTH_TOKEN_ENDPOINT = "https://www.strava.com/api/v3/oauth/token"
     }
+
+    private val _firebaseAuth = Firebase.auth
 
     private val _firebaseCustomTokenService = Retrofit.Builder()
         .baseUrl(BuildConfig.FIREBASE_CUSTOM_TOKEN_HOST)
@@ -108,9 +112,10 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                         if (authState.isAuthorized && refreshToken != null) {
                             try {
                                 val firebaseTokenResponse = _firebaseCustomTokenService.firebaseToken(refreshToken)
-                                debugInfo = "Firebase token: ${firebaseTokenResponse.firebaseCustomToken?.subSequence(0, 8)}..."
+                                val authResult = _firebaseAuth.signInWithCustomToken(firebaseTokenResponse.firebaseCustomToken).await()
+                                debugInfo = "Hi, ${authResult.user?.displayName}!"
                             } catch (_: Exception) {
-                                debugInfo = "Error getting firebase token"
+                                debugInfo = "Error logging in"
                             }
                         } else {
                             debugInfo = "Not authorised"
