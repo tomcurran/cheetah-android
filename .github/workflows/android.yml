@@ -25,6 +25,9 @@ jobs:
 
     - name: Setup keystore
       run: |
+        set -x
+        pwd
+        ls -la
         touch release.keystore
         echo "dGVzdAo=" | base64 --decode > release.keystore
       working-directory: ./app
