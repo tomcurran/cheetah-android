@@ -23,6 +23,21 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
 
+    - name: Setup keystore
+      run: |
+        touch release.keystore
+        echo "dGVzdAo=" | base64 --decode > release.keystore
+      working-directory: ./app
+    - name: Setup secret properties
+      run: |
+        touch secret.properties
+        echo "keyStore=release.keystore" >> secret.properties
+        echo "keyStorePassword=keystorepassword" >> secret.properties
+        echo "keyAlias=keyalias" >> secret.properties
+        echo "keyAliasPassword=keyaliaspassword" >> secret.properties
+        echo "stravaOAuthClientId=client_id" >> secret.properties
+        echo "stravaOAuthClientSecret=client_secret" >> secret.properties
+      working-directory: ./app
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
