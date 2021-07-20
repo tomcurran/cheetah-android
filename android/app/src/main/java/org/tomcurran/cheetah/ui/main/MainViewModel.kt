@@ -44,22 +44,43 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _startActivityForResult = MutableLiveData<Event<Intent>>()
     val startActivityForResult: LiveData<Event<Intent>> = _startActivityForResult
 
+    private val _loggedIn = MutableLiveData<Boolean>()
+
     private val _loggingIn = MutableLiveData<Boolean>()
     val loggingIn: LiveData<Boolean> = _loggingIn
 
-    private val _debugInfo = MutableLiveData<String>()
-    val debugInfo: LiveData<String> = _debugInfo
+    val loginLogoutText: LiveData<String> = Transformations.map(_loggedIn) {
+            loggedIn -> if (loggedIn) "Logout" else "Login"
+    }
 
-    val debugInfoVisible: LiveData<Boolean> = Transformations.map(debugInfo) {
-        debugInfo -> debugInfo.isNotEmpty()
+    private val _message = MutableLiveData<String>()
+    val message: LiveData<String> = _message
+
+    val messageVisible: LiveData<Boolean> = Transformations.map(message) {
+        message -> message.isNotEmpty()
     }
 
     init {
         _loggingIn.value = false
-        _debugInfo.value = ""
+        _message.value = ""
+        _loggedIn.value = false
+
+        val firebaseUser = _firebaseAuth.currentUser
+        if (firebaseUser != null) {
+            _message.value = "Hi, ${firebaseUser.displayName}!"
+            _loggedIn.value = true
+        }
     }
 
-    fun login() {
+    fun loginLogout() {
+        if (_loggedIn.value == true) {
+            logout()
+        } else {
+            login()
+        }
+    }
+
+    private fun login() {
         _loggingIn.value = true
         viewModelScope.launch(Dispatchers.Default) {
             val authServiceConfiguration = AuthorizationServiceConfiguration(
@@ -90,7 +111,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun onActivityResult(activityResult: ActivityResult) {
         viewModelScope.launch(Dispatchers.IO) {
-            var debugInfo = ""
+            var message = ""
             val data = activityResult.data
             if (activityResult.resultCode == Activity.RESULT_OK && data != null) {
                 val authResponse = AuthorizationResponse.fromIntent(data)
@@ -112,24 +133,38 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                             try {
                                 val firebaseTokenResponse = _firebaseCustomTokenService.firebaseToken(refreshToken)
                                 val authResult = _firebaseAuth.signInWithCustomToken(firebaseTokenResponse.firebaseCustomToken).await()
-                                debugInfo = "Hi, ${authResult.user?.displayName}!"
+                                val firebaseUser = authResult.user
+                                if (firebaseUser != null) {
+                                    message = "Hi, ${firebaseUser.displayName}!"
+                                    withContext(Dispatchers.Main) {
+                                        _loggedIn.value = true
+                                    }
+                                } else {
+                                    message = "Error logging in"
+                                }
                             } catch (_: Exception) {
-                                debugInfo = "Error logging in"
+                                message = "Error logging in"
                             }
                         } else {
-                            debugInfo = "Not authorised"
+                            message = "Not authorised"
                         }
                     } else {
-                        debugInfo = "Error / Cancelled"
+                        message = "Error / Cancelled"
                     }
                 }
             } else {
-                debugInfo = "Error / Cancelled"
+                message = "Error / Cancelled"
             }
             withContext(Dispatchers.Main) {
-                _debugInfo.value = debugInfo
+                _message.value = message
                 _loggingIn.value = false
             }
         }
+    }
+
+    private fun logout() {
+        _firebaseAuth.signOut()
+        _message.value = ""
+        _loggedIn.value = false
     }
 }
