@@ -1,4 +1,4 @@
-package org.tomcurran.cheetah.ui.login
+package org.tomcurran.cheetah.ui.main
 
 import android.content.res.Configuration
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -20,33 +20,33 @@ import org.tomcurran.cheetah.ui.theme.CheetahTheme
 import org.tomcurran.cheetah.util.EventObserver
 
 @Composable
-fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
-    val debugInfoVisible: Boolean by loginViewModel.debugInfoVisible.observeAsState(false)
-    val debugInfo: String by loginViewModel.debugInfo.observeAsState("")
-    val loggingIn: Boolean by loginViewModel.loggingIn.observeAsState(false)
+fun MainScreen(mainViewModel: MainViewModel = viewModel()) {
+    val debugInfoVisible: Boolean by mainViewModel.debugInfoVisible.observeAsState(false)
+    val debugInfo: String by mainViewModel.debugInfo.observeAsState("")
+    val loggingIn: Boolean by mainViewModel.loggingIn.observeAsState(false)
     val activityResultLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { activityResult ->
-        loginViewModel.onActivityResult(activityResult)
+        mainViewModel.onActivityResult(activityResult)
     }
-    loginViewModel.startActivityForResult.observe(LocalLifecycleOwner.current, EventObserver { intent ->
+    mainViewModel.startActivityForResult.observe(LocalLifecycleOwner.current, EventObserver { intent ->
         try {
             activityResultLauncher.launch(intent)
         } catch (e: Exception) {
             // intentionally left blank - onActivityResult will handle the failure
         }
     })
-    LoginContent(
+    MainContent(
         debugInfoVisible = debugInfoVisible,
         debugInfo = debugInfo,
         loggingIn = loggingIn,
-        onLoginClick = { loginViewModel.login() },
+        onLoginClick = { mainViewModel.login() },
     )
     MainActivity.keepSplashScreenVisible = false // TODO place in better location
 }
 
 @Composable
-fun LoginContent(
+fun MainContent(
     debugInfoVisible: Boolean,
     debugInfo: String,
     loggingIn: Boolean,
@@ -75,14 +75,14 @@ fun LoginContent(
     }
 }
 
-@Preview("Login screen", showBackground = true)
-@Preview("Login screen (dark)", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Preview("Login screen (big font)", fontScale = 1.5f)
-@Preview("Login screen (large screen)", device = Devices.PIXEL_C)
+@Preview("Main screen", showBackground = true)
+@Preview("Main screen (dark)", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview("Main screen (big font)", fontScale = 1.5f)
+@Preview("Main screen (large screen)", device = Devices.PIXEL_C)
 @Composable
 fun DefaultPreview() {
     CheetahTheme {
-        LoginContent(
+        MainContent(
             debugInfoVisible = true,
             debugInfo = "Access token: test...",
             loggingIn = false,

@@ -1,4 +1,4 @@
-package org.tomcurran.cheetah.ui.login
+package org.tomcurran.cheetah.ui.main
 
 import android.app.Activity
 import android.app.Application
@@ -8,7 +8,6 @@ import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.*
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +23,7 @@ import kotlin.coroutines.suspendCoroutine
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class LoginViewModel(application: Application) : AndroidViewModel(application) {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     companion object {
         private const val STRAVA_OAUTH_SCOPE = "activity:read_all"

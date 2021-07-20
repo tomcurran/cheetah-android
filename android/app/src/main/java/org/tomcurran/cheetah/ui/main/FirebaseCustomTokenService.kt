@@ -1,4 +1,4 @@
-package org.tomcurran.cheetah.ui.login
+package org.tomcurran.cheetah.ui.main
 
 import retrofit2.http.POST
 import retrofit2.http.Query
