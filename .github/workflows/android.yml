@@ -8,9 +8,7 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Setup JDK 11
@@ -18,28 +16,21 @@ jobs:
       with:
         java-version: '11'
         distribution: 'adopt'
-
-    - name: Setup keystore
+    - name: Setup secrets
       run: |
         touch release.keystore
         echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > release.keystore
-      working-directory: android/app
-      env:
-        ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-    - name: Setup secret properties
-      run: |
         touch secret.properties
         echo "$ANDROID_SECRET_PROPERTIES_BASE64" | base64 --decode > secret.properties
       working-directory: android/app
       env:
+        ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         ANDROID_SECRET_PROPERTIES_BASE64: ${{ secrets.ANDROID_SECRET_PROPERTIES_BASE64 }}
-
     - name: Build with Gradle
       run: |
         chmod +x gradlew
         ./gradlew assembleDevRelease
       working-directory: android
-
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v2.2.4
       with:        
