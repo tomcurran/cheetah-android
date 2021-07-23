@@ -34,5 +34,5 @@ jobs:
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v2.2.4
       with:        
-        path: android/app/build/outputs/apk/dev/release/app-dev-release.apk
+        path: android/app/build/outputs/**/app-*.apk
         if-no-files-found: error
